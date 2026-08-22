@@ -1,0 +1,25 @@
+package com.example.movil.data.orders
+
+import retrofit2.Response
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.POST
+import retrofit2.http.Path
+
+interface OrdersApiService {
+    @POST("api/orders/checkout")
+    suspend fun checkout(
+        @Header("Authorization") authorization: String,
+        @Body request: CheckoutRequest
+    ): Response<CheckoutResponse>
+
+    @GET("api/orders/")
+    suspend fun getOrders(@Header("Authorization") authorization: String): Response<OrdersResponse>
+
+    @GET("api/orders/{id}")
+    suspend fun getOrder(
+        @Header("Authorization") authorization: String,
+        @Path("id") orderId: Int
+    ): Response<OrderResponse>
+}
