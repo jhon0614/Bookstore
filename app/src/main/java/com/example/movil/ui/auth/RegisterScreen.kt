@@ -1,10 +1,16 @@
 package com.example.movil.ui.auth
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 
@@ -27,55 +33,43 @@ fun RegisterScreen(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
+        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Registro de Cliente", style = MaterialTheme.typography.headlineLarge)
+        Surface(color = MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.large) {
+            Icon(Icons.Default.PersonAdd, contentDescription = null, modifier = Modifier.padding(18.dp).size(42.dp))
+        }
         Spacer(Modifier.height(16.dp))
+        Text("Crea tu cuenta", style = MaterialTheme.typography.headlineMedium)
+        Text("Guarda tus datos y continúa leyendo", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(Modifier.height(24.dp))
 
-        OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Nombre de Usuario") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Contraseña") },
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(Modifier.height(16.dp))
-
-        if (state is UiState.Loading) {
-            CircularProgressIndicator()
-        } else {
-            Button(
-                onClick = { if (name.isNotBlank() && email.isNotBlank() && password.isNotBlank()) viewModel.register(name, email, password) },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Registrar")
+        ElevatedCard(Modifier.fillMaxWidth()) {
+            Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                OutlinedTextField(name, { name = it }, label = { Text("Nombre") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(
+                    email, { email = it }, label = { Text("Correo electrónico") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    singleLine = true, modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    password, { password = it }, label = { Text("Contraseña") },
+                    supportingText = { Text("Mínimo 6 caracteres") },
+                    visualTransformation = PasswordVisualTransformation(), singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                (state as? UiState.Error)?.let { Text(it.message, color = MaterialTheme.colorScheme.error) }
+                Button(
+                    onClick = { viewModel.register(name.trim(), email.trim(), password) },
+                    enabled = name.isNotBlank() && email.isNotBlank() && password.length >= 6 && state !is UiState.Loading,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp)
+                ) {
+                    if (state is UiState.Loading) CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 2.dp)
+                    else Text("Crear cuenta")
+                }
             }
         }
-
-        if (state is UiState.Error) {
-            Text((state as UiState.Error).message, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 8.dp))
-        }
-
-        TextButton(onClick = onNavigateToLogin) {
-            Text("¿Ya tienes cuenta? Inicia Sesión")
-        }
+        TextButton(onClick = onNavigateToLogin) { Text("¿Ya tienes cuenta? Inicia sesión") }
     }
 }

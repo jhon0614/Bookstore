@@ -13,7 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
     // Emulador Android. Para celular físico, usar aquí la IP local del computador.
-    private const val BASE_URL = "http://10.127.120.229:5050/"
+    private const val BASE_URL = "http://192.168.1.7:5050/"
 
     @Volatile private var retrofitInstance: Retrofit? = null
 
@@ -29,8 +29,10 @@ object RetrofitClient {
         val client = OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val token = runBlocking { session.getTokenSync() }
+                val guestId = runBlocking { session.getOrCreateGuestId() }
                 val request = chain.request().newBuilder().apply {
                     if (!token.isNullOrBlank()) header("Authorization", "Bearer $token")
+                    header("X-Guest-Id", guestId)
                 }.build()
                 chain.proceed(request).also { response ->
                     if (response.code == 401) runBlocking { session.clearSession() }

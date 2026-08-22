@@ -12,6 +12,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.movil.data.orders.Order
 import com.example.movil.ui.cart.money
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 
 @Composable
 fun OrdersScreen(
@@ -29,7 +31,9 @@ fun OrdersScreen(
         topBar = {
             @OptIn(ExperimentalMaterial3Api::class)
             TopAppBar(title = { Text("Mis pedidos") }, navigationIcon = {
-                TextButton(onClick = onBack) { Text("Volver") }
+                IconButton(onClick = onBack) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                }
             })
         }
     ) { padding ->
@@ -53,15 +57,15 @@ fun OrdersScreen(
 
 @Composable
 private fun OrderCard(order: Order, onClick: () -> Unit) {
-    Card(Modifier.fillMaxWidth().clickable(onClick = onClick)) {
+    ElevatedCard(Modifier.fillMaxWidth().clickable(onClick = onClick)) {
         Column(Modifier.padding(16.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text("Pedido #${order.id}", style = MaterialTheme.typography.titleMedium)
-                Text(order.status.replaceFirstChar { it.uppercase() })
+                SuggestionChip(onClick = {}, label = { Text(order.status.replaceFirstChar { it.uppercase() }) })
             }
             Text(readableDate(order.createdAt))
             Text("Pago: ${order.paymentMethod.replaceFirstChar { it.uppercase() }}")
-            Text("Total: ${money(order.total)}", style = MaterialTheme.typography.titleSmall)
+            Text(money(order.total), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
         }
     }
 }

@@ -1,47 +1,27 @@
 package com.example.movil.ui.books
 
-
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.movil.data.books.Book
 
-/**
- * Pantalla de detalle. No implementa el carrito: al presionar "Agregar al
- * carrito" simplemente invoca onAddToCart(bookId, quantity), que es
- * conectado desde afuera (persona encargada del módulo de carrito).
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookDetailScreen(
@@ -51,6 +31,7 @@ fun BookDetailScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val success = uiState as? BookDetailUiState.Success
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -61,47 +42,54 @@ fun BookDetailScreen(
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors()
+                }
             )
-        }
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            when (val state = uiState) {
-                is BookDetailUiState.Loading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                }
-
-                is BookDetailUiState.Error -> {
-                    Column(
+        },
+        bottomBar = {
+            success?.let { state ->
+                Surface(shadowElevation = 10.dp, tonalElevation = 3.dp) {
+                    Button(
+                        onClick = { onAddToCart(state.book.id, state.quantity) },
+                        enabled = state.book.stock > 0,
                         modifier = Modifier
-                            .align(Alignment.Center)
-                            .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                            .navigationBarsPadding()
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
+                            .fillMaxWidth()
+                            .heightIn(min = 52.dp)
                     ) {
-                        Text(text = state.message)
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Button(onClick = viewModel::loadBook) {
-                            Text("Reintentar")
-                        }
+                        Icon(Icons.Default.ShoppingCart, contentDescription = null)
+                        Spacer(Modifier.width(10.dp))
+                        Text(if (state.book.stock > 0) "Agregar al carrito" else "Libro agotado")
                     }
-                }
-
-                is BookDetailUiState.Success -> {
-                    BookDetailContent(
-                        book = state.book,
-                        quantity = state.quantity,
-                        onIncrement = viewModel::incrementQuantity,
-                        onDecrement = viewModel::decrementQuantity,
-                        onAddToCart = { onAddToCart(state.book.id, state.quantity) }
-                    )
                 }
             }
         }
+    ) { paddingValues ->
+        Box(Modifier.fillMaxSize().padding(paddingValues)) {
+            when (val state = uiState) {
+                BookDetailUiState.Loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
+                is BookDetailUiState.Error -> ErrorDetail(state.message, viewModel::loadBook)
+                is BookDetailUiState.Success -> BookDetailContent(
+                    book = state.book,
+                    quantity = state.quantity,
+                    onIncrement = viewModel::incrementQuantity,
+                    onDecrement = viewModel::decrementQuantity
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ErrorDetail(message: String, retry: () -> Unit) {
+    Column(
+        Modifier.fillMaxSize().padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(message, color = MaterialTheme.colorScheme.error)
+        Spacer(Modifier.height(12.dp))
+        Button(onClick = retry) { Text("Reintentar") }
     }
 }
 
@@ -110,114 +98,68 @@ private fun BookDetailContent(
     book: Book,
     quantity: Int,
     onIncrement: () -> Unit,
-    onDecrement: () -> Unit,
-    onAddToCart: () -> Unit
+    onDecrement: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(280.dp),
+                .height(210.dp)
+                .background(MaterialTheme.colorScheme.primaryContainer, MaterialTheme.shapes.large),
             contentAlignment = Alignment.Center
-        ) { Text("📖", style = MaterialTheme.typography.displayLarge) }
+        ) { Text("📚", style = MaterialTheme.typography.displayLarge) }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(text = book.title, style = MaterialTheme.typography.headlineSmall)
-        Text(text = book.author, style = MaterialTheme.typography.titleMedium)
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(text = formatPrice(book.price), style = MaterialTheme.typography.headlineSmall)
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        if (book.stock > 0) {
-            Text(
-                text = "Disponible · Stock: ${book.stock}",
-                color = MaterialTheme.colorScheme.primary
-            )
-        } else {
-            Text(
-                text = "Agotado",
-                color = MaterialTheme.colorScheme.error
-            )
-        }
+        Spacer(Modifier.height(22.dp))
+        Text(book.title, style = MaterialTheme.typography.headlineSmall)
+        Text(book.author, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(Modifier.height(12.dp))
+        Text(formatPrice(book.price), style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary)
+        Text(
+            if (book.stock > 0) "Disponible · ${book.stock} en inventario" else "Agotado",
+            color = if (book.stock > 0) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.error,
+            fontWeight = FontWeight.SemiBold
+        )
 
         if (book.categories.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(8.dp))
-            LazyRow {
+            Spacer(Modifier.height(8.dp))
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(book.categories, key = { it.id }) { category ->
-                    AssistChip(
-                        onClick = {},
-                        label = { Text(category.name) },
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
+                    AssistChip(onClick = {}, label = { Text(category.name) })
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-        HorizontalDivider()
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(text = "Género: ${book.genre}", style = MaterialTheme.typography.bodyMedium)
-        Text(text = "ISBN: ${book.isbn}", style = MaterialTheme.typography.bodyMedium)
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Text(
-            text = book.description ?: "Sin descripción disponible.",
-            style = MaterialTheme.typography.bodyMedium
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
+        HorizontalDivider(Modifier.padding(vertical = 20.dp))
+        Text("Información", style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.height(8.dp))
+        Text("Género: ${book.genre}")
+        Text("ISBN: ${book.isbn}")
+        Spacer(Modifier.height(14.dp))
+        Text(book.description ?: "Sin descripción disponible.", color = MaterialTheme.colorScheme.onSurfaceVariant)
 
         if (book.stock > 0) {
-            Text(text = "Cantidad", style = MaterialTheme.typography.titleSmall)
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(Modifier.height(24.dp))
+            Text("Cantidad", style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.height(10.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                OutlinedButton(
-                    onClick = onDecrement,
-                    enabled = quantity > 1
-                ) {
+                FilledTonalIconButton(onClick = onDecrement, enabled = quantity > 1, shape = CircleShape) {
                     Icon(Icons.Default.Remove, contentDescription = "Disminuir cantidad")
                 }
                 Text(
-                    text = quantity.toString(),
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier
-                        .padding(horizontal = 24.dp)
+                    quantity.toString(),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(horizontal = 24.dp)
                 )
-                OutlinedButton(
-                    onClick = onIncrement,
-                    enabled = quantity < book.stock
-                ) {
+                FilledTonalIconButton(onClick = onIncrement, enabled = quantity < book.stock, shape = CircleShape) {
                     Icon(Icons.Default.Add, contentDescription = "Aumentar cantidad")
                 }
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Button(
-                onClick = onAddToCart,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Agregar al carrito")
-            }
-        } else {
-            Spacer(modifier = Modifier.height(24.dp))
-            Button(
-                onClick = {},
-                enabled = false,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Agotado")
-            }
         }
+        Spacer(Modifier.height(16.dp))
     }
 }

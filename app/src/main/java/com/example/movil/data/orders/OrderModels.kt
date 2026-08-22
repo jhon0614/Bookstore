@@ -16,7 +16,7 @@ data class OrderResponse(val order: Order)
 
 data class Order(
     val id: Int,
-    @SerializedName("user_id") val userId: Int,
+    @SerializedName("user_id") val userId: Int?,
     val status: String,
     @SerializedName("payment_method") val paymentMethod: String,
     val total: Double,

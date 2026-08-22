@@ -4,9 +4,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,12 +64,9 @@ fun AppNavigation() {
 
     val loggedIn = !session?.token.isNullOrBlank()
     val isAdmin = session?.role == "admin"
-    val startDestination = if (loggedIn) Routes.Home.route else Routes.Login.route
+    val startDestination = Routes.Home.route
     val goToLogin = { navController.navigate(Routes.Login.route) { popUpTo(0) } }
-
-    LaunchedEffect(loggedIn) {
-        if (!loggedIn && navController.currentDestination?.route != Routes.Login.route) goToLogin()
-    }
+    val goToHome = { navController.navigate(Routes.Home.route) { popUpTo(0) } }
 
     NavHost(navController = navController, startDestination = startDestination) {
         composable(Routes.Login.route) {
@@ -82,7 +79,9 @@ fun AppNavigation() {
         }
         composable(Routes.Home.route) {
             HomeScreen(
+                isLoggedIn = loggedIn,
                 isAdmin = isAdmin,
+                onNavigateToLogin = { navController.navigate(Routes.Login.route) },
                 onNavigateToProfile = { navController.navigate(Routes.Profile.route) },
                 onNavigateToUsers = { navController.navigate(Routes.AdminUsers.route) },
                 onNavigateToBooks = { navController.navigate(Routes.Books.route) },
@@ -91,13 +90,22 @@ fun AppNavigation() {
             )
         }
         composable(Routes.Profile.route) {
-            ProfileScreen(profileViewModel, { navController.navigate(Routes.EditProfile.route) },
-                { navController.navigate(Routes.ChangePassword.route) }, goToLogin)
+            if (loggedIn) {
+                ProfileScreen(profileViewModel, { navController.navigate(Routes.EditProfile.route) },
+                    { navController.navigate(Routes.ChangePassword.route) }, goToHome,
+                    { navController.popBackStack() })
+            } else {
+                LaunchedEffect(Unit) { goToLogin() }
+            }
         }
         composable(Routes.EditProfile.route) { EditProfileScreen(profileViewModel) { navController.popBackStack() } }
         composable(Routes.ChangePassword.route) { ChangePasswordScreen(profileViewModel) { navController.popBackStack() } }
         composable(Routes.AdminUsers.route) {
-            if (isAdmin) UsersScreen(adminViewModel) { navController.navigate(Routes.CreateAdmin.route) }
+            if (isAdmin) UsersScreen(
+                adminViewModel,
+                { navController.navigate(Routes.CreateAdmin.route) },
+                { navController.popBackStack() }
+            )
         }
         composable(Routes.CreateAdmin.route) {
             if (isAdmin) CreateAdminScreen(adminViewModel) { navController.popBackStack() }
@@ -105,7 +113,8 @@ fun AppNavigation() {
         composable(Routes.Books.route) {
             BooksScreen(
                 viewModel = booksViewModel,
-                onBookClick = { navController.navigate(Routes.BookDetail.create(it)) }
+                onBookClick = { navController.navigate(Routes.BookDetail.create(it)) },
+                onBack = { navController.popBackStack() }
             )
         }
         composable(

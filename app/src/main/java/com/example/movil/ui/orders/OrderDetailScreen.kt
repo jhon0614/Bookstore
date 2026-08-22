@@ -10,6 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.movil.ui.cart.money
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 
 @Composable
 fun OrderDetailScreen(
@@ -26,7 +28,9 @@ fun OrderDetailScreen(
         topBar = {
             @OptIn(ExperimentalMaterial3Api::class)
             TopAppBar(title = { Text("Detalle del pedido") }, navigationIcon = {
-                TextButton(onClick = onBack) { Text("Volver") }
+                IconButton(onClick = onBack) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                }
             })
         }
     ) { padding ->
@@ -49,7 +53,7 @@ fun OrderDetailScreen(
                             Spacer(Modifier.height(12.dp))
                         }
                         items(order.items, key = { it.id }) { item ->
-                            Card(Modifier.fillMaxWidth()) {
+                            ElevatedCard(Modifier.fillMaxWidth()) {
                                 Column(Modifier.padding(12.dp)) {
                                     Text(item.title, style = MaterialTheme.typography.titleMedium)
                                     Text("Cantidad: ${item.quantity}")

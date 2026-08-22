@@ -8,6 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.movil.ui.auth.UiState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 
 @Composable
 fun ChangePasswordScreen(
@@ -29,7 +31,10 @@ fun ChangePasswordScreen(
         modifier = Modifier.fillMaxSize().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Cambiar Contraseña", style = MaterialTheme.typography.headlineMedium)
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Volver") }
+            Text("Cambiar contraseña", style = MaterialTheme.typography.headlineMedium)
+        }
         Spacer(Modifier.height(16.dp))
 
         OutlinedTextField(
@@ -37,7 +42,8 @@ fun ChangePasswordScreen(
             onValueChange = { currentPass = it },
             label = { Text("Contraseña Actual") },
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
         )
         Spacer(Modifier.height(8.dp))
 
@@ -46,7 +52,9 @@ fun ChangePasswordScreen(
             onValueChange = { newPass = it },
             label = { Text("Nueva Contraseña") },
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            supportingText = { Text("Mínimo 6 caracteres") }
         )
         Spacer(Modifier.height(16.dp))
 
@@ -54,7 +62,8 @@ fun ChangePasswordScreen(
             CircularProgressIndicator()
         } else {
             Button(
-                onClick = { if (currentPass.isNotBlank() && newPass.isNotBlank()) viewModel.changePassword(currentPass, newPass) },
+                onClick = { viewModel.changePassword(currentPass, newPass) },
+                enabled = currentPass.isNotBlank() && newPass.length >= 6,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Actualizar Contraseña")

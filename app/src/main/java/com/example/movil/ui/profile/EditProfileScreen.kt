@@ -7,6 +7,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.movil.ui.auth.UiState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 
 @Composable
 fun EditProfileScreen(
@@ -41,14 +43,18 @@ fun EditProfileScreen(
         modifier = Modifier.fillMaxSize().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Editar Perfil", style = MaterialTheme.typography.headlineMedium)
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Volver") }
+            Text("Editar perfil", style = MaterialTheme.typography.headlineMedium)
+        }
         Spacer(Modifier.height(16.dp))
 
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },
             label = { Text("Nuevo Nombre") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
         )
         Spacer(Modifier.height(8.dp))
 
@@ -56,7 +62,8 @@ fun EditProfileScreen(
             value = email,
             onValueChange = { email = it },
             label = { Text("Nuevo Email") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
         )
         Spacer(Modifier.height(16.dp))
 

@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,7 +33,9 @@ fun CartScreen(
         topBar = {
             @OptIn(ExperimentalMaterial3Api::class)
             TopAppBar(title = { Text("Mi carrito") }, navigationIcon = {
-                TextButton(onClick = onBack) { Text("Volver") }
+                IconButton(onClick = onBack) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                }
             })
         }
     ) { padding ->
@@ -56,9 +59,16 @@ fun CartScreen(
                             )
                         }
                     }
-                    HorizontalDivider()
-                    Text("${state.cart.count} ejemplares", style = MaterialTheme.typography.bodyMedium)
-                    Text("Total: ${money(state.cart.total)}", style = MaterialTheme.typography.headlineSmall)
+                    Spacer(Modifier.height(12.dp))
+                    Surface(color = MaterialTheme.colorScheme.primaryContainer, shape = MaterialTheme.shapes.large) {
+                        Row(Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Column {
+                                Text("Resumen", style = MaterialTheme.typography.titleMedium)
+                                Text("${state.cart.count} ejemplares", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                            Text(money(state.cart.total), style = MaterialTheme.typography.headlineSmall)
+                        }
+                    }
                     Spacer(Modifier.height(12.dp))
                     Button(onClick = onCheckout, modifier = Modifier.fillMaxWidth(), enabled = !state.isLoading) {
                         Text("Continuar con el pago")
@@ -86,11 +96,11 @@ fun CartScreen(
 
 @Composable
 private fun CartItemCard(item: CartItem, enabled: Boolean, onQuantity: (Int) -> Unit, onRemove: () -> Unit) {
-    Card(Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(12.dp)) {
+    ElevatedCard(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp)) {
             Text(item.book.title, style = MaterialTheme.typography.titleMedium)
-            Text(item.book.author, style = MaterialTheme.typography.bodyMedium)
-            Text("Precio: ${money(item.book.price)}")
+            Text(item.book.author, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(money(item.book.price), color = MaterialTheme.colorScheme.primary)
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 OutlinedButton(onClick = { onQuantity(item.quantity - 1) }, enabled = enabled && item.quantity > 1) { Text("−") }
                 Text(item.quantity.toString(), modifier = Modifier.padding(horizontal = 16.dp))

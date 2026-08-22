@@ -9,6 +9,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.movil.data.orders.PaymentMethod
 import com.example.movil.ui.orders.OrdersViewModel
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 
 @Composable
 fun CheckoutScreen(
@@ -41,14 +43,20 @@ fun CheckoutScreen(
         topBar = {
             @OptIn(ExperimentalMaterial3Api::class)
             TopAppBar(title = { Text("Confirmar pedido") }, navigationIcon = {
-                TextButton(onClick = onBack) { Text("Volver") }
+                IconButton(onClick = onBack) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                }
             })
         }
     ) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).padding(16.dp)) {
-            Text("Resumen", style = MaterialTheme.typography.headlineSmall)
-            Text("${cartState.cart.count} ejemplares")
-            Text("Total: ${money(cartState.cart.total)}", style = MaterialTheme.typography.titleLarge)
+            Surface(color = MaterialTheme.colorScheme.primaryContainer, shape = MaterialTheme.shapes.large) {
+                Column(Modifier.fillMaxWidth().padding(18.dp)) {
+                    Text("Resumen de compra", style = MaterialTheme.typography.titleLarge)
+                    Text("${cartState.cart.count} ejemplares")
+                    Text(money(cartState.cart.total), style = MaterialTheme.typography.headlineMedium)
+                }
+            }
             Spacer(Modifier.height(24.dp))
             Text("Método de pago", style = MaterialTheme.typography.titleMedium)
             PaymentMethod.entries.forEach { method ->

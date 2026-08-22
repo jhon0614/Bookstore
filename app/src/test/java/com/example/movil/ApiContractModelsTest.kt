@@ -11,6 +11,7 @@ import com.example.movil.data.orders.OrdersResponse
 import com.google.gson.Gson
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class ApiContractModelsTest {
@@ -44,5 +45,16 @@ class ApiContractModelsTest {
         assertEquals(2, cart.count)
         assertEquals(3, checkout.order.id)
         assertTrue(orders.orders.single().items.isNotEmpty())
+    }
+
+    @Test
+    fun anonymousOrderAllowsNullUserId() {
+        val order = gson.fromJson(
+            """{"id":7,"user_id":null,"status":"confirmado","payment_method":"efectivo","total":39000.0,"created_at":"2026-08-22T12:00:00","items":[]}""",
+            com.example.movil.data.orders.Order::class.java
+        )
+
+        assertEquals(7, order.id)
+        assertNull(order.userId)
     }
 }

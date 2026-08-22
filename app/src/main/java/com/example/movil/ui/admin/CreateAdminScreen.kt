@@ -8,6 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.movil.ui.auth.UiState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 
 @Composable
 fun CreateAdminScreen(
@@ -30,14 +32,17 @@ fun CreateAdminScreen(
         modifier = Modifier.fillMaxSize().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Crear Administrador", style = MaterialTheme.typography.headlineMedium)
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Volver") }
+            Text("Crear administrador", style = MaterialTheme.typography.headlineMedium)
+        }
         Spacer(Modifier.height(16.dp))
 
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },
             label = { Text("Nombre") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(), singleLine = true
         )
         Spacer(Modifier.height(8.dp))
 
@@ -45,7 +50,7 @@ fun CreateAdminScreen(
             value = email,
             onValueChange = { email = it },
             label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(), singleLine = true
         )
         Spacer(Modifier.height(8.dp))
 
@@ -54,7 +59,8 @@ fun CreateAdminScreen(
             onValueChange = { password = it },
             label = { Text("Contraseña") },
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(), singleLine = true,
+            supportingText = { Text("Mínimo 6 caracteres") }
         )
         Spacer(Modifier.height(16.dp))
 
@@ -63,10 +69,9 @@ fun CreateAdminScreen(
         } else {
             Button(
                 onClick = {
-                    if (name.isNotBlank() && email.isNotBlank() && password.isNotBlank()) {
-                        viewModel.createAdmin(name, email, password)
-                    }
+                    viewModel.createAdmin(name.trim(), email.trim(), password)
                 },
+                enabled = name.isNotBlank() && email.isNotBlank() && password.length >= 6,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Guardar Administrador")

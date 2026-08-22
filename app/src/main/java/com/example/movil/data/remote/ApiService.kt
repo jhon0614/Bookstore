@@ -11,9 +11,6 @@ interface ApiService {
     @POST("api/auth/register")
     suspend fun register(@Body request: RegisterRequest): Response<AuthResponse>
 
-    @POST("api/auth/verify-token")
-    suspend fun verifyToken(): Response<ApiMessageResponse>
-
     @PUT("api/auth/change-password")
     suspend fun changePassword(@Body request: ChangePasswordRequest): Response<ApiMessageResponse>
 

@@ -7,6 +7,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import java.util.UUID
 
 // Renombrado a sessionDataStore para evitar conflicto de nombres a nivel de paquete
 private val Context.sessionDataStore by preferencesDataStore(name = "user_session")
@@ -16,6 +17,7 @@ class SessionManager(private val context: Context) {
         private val TOKEN_KEY = stringPreferencesKey("jwt_token")
         private val ROLE_KEY = stringPreferencesKey("user_role")
         private val USER_ID_KEY = stringPreferencesKey("user_id")
+        private val GUEST_ID_KEY = stringPreferencesKey("guest_id")
     }
 
     val authToken: Flow<String?> = context.sessionDataStore.data.map { pref -> pref[TOKEN_KEY] }
@@ -36,8 +38,21 @@ class SessionManager(private val context: Context) {
         return context.sessionDataStore.data.map { pref -> pref[TOKEN_KEY] }.first()
     }
 
+    suspend fun getOrCreateGuestId(): String {
+        context.sessionDataStore.data.first()[GUEST_ID_KEY]?.let { return it }
+        val guestId = UUID.randomUUID().toString()
+        context.sessionDataStore.edit { pref ->
+            if (pref[GUEST_ID_KEY].isNullOrBlank()) pref[GUEST_ID_KEY] = guestId
+        }
+        return context.sessionDataStore.data.first()[GUEST_ID_KEY] ?: guestId
+    }
+
     suspend fun clearSession() {
-        context.sessionDataStore.edit { pref -> pref.clear() }
+        context.sessionDataStore.edit { pref ->
+            pref.remove(TOKEN_KEY)
+            pref.remove(ROLE_KEY)
+            pref.remove(USER_ID_KEY)
+        }
     }
 }
 

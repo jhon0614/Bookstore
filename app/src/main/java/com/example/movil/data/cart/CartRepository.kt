@@ -2,7 +2,6 @@ package com.example.movil.data.cart
 
 import android.content.Context
 import com.example.movil.data.remote.RetrofitClient
-import com.example.movil.data.session.SessionManager
 import org.json.JSONObject
 import retrofit2.Response
 
@@ -10,29 +9,22 @@ class CartRepository(
     context: Context,
     private val api: CartApiService = RetrofitClient.getCartApiService(context)
 ) {
-    private val session = SessionManager(context.applicationContext)
-    suspend fun getCart(): DataResult<CartResponse> = execute { api.getCart(authorization()) }
+    suspend fun getCart(): DataResult<CartResponse> = execute { api.getCart() }
 
     suspend fun addItem(bookId: Int, quantity: Int): DataResult<CartMutationResponse> {
         if (quantity <= 0) return DataResult.Error("La cantidad debe ser mayor que cero")
-        return execute { api.addItem(authorization(), AddCartItemRequest(bookId, quantity)) }
+        return execute { api.addItem(AddCartItemRequest(bookId, quantity)) }
     }
 
     suspend fun updateItem(itemId: Int, quantity: Int): DataResult<CartMutationResponse> {
         if (quantity <= 0) return DataResult.Error("La cantidad debe ser mayor que cero")
-        return execute { api.updateItem(authorization(), itemId, UpdateCartItemRequest(quantity)) }
+        return execute { api.updateItem(itemId, UpdateCartItemRequest(quantity)) }
     }
 
     suspend fun removeItem(itemId: Int): DataResult<CartMutationResponse> =
-        execute { api.removeItem(authorization(), itemId) }
+        execute { api.removeItem(itemId) }
 
-    suspend fun clearCart(): DataResult<ApiMessage> = execute { api.clearCart(authorization()) }
-
-    private suspend fun authorization(): String {
-        val token = session.getTokenSync()?.takeIf { it.isNotBlank() }
-            ?: throw IllegalStateException("No hay una sesión activa")
-        return "Bearer $token"
-    }
+    suspend fun clearCart(): DataResult<ApiMessage> = execute { api.clearCart() }
 }
 
 internal suspend fun <T> execute(block: suspend () -> Response<T>): DataResult<T> = try {

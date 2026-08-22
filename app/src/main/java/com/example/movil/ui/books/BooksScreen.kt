@@ -1,6 +1,7 @@
 package com.example.movil.ui.books
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,8 +20,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -29,6 +31,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -48,6 +52,7 @@ import java.util.Locale
 fun BooksScreen(
     viewModel: BooksViewModel,
     onBookClick: (Int) -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -66,7 +71,17 @@ fun BooksScreen(
     }
 
     Scaffold(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                title = { Text("Explorar libros") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                    }
+                }
+            )
+        }
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
 
@@ -177,7 +192,7 @@ private fun BookListItem(
     book: Book,
     onClick: () -> Unit
 ) {
-    Card(modifier = Modifier
+    ElevatedCard(modifier = Modifier
         .fillMaxWidth()
         .clickable(onClick = onClick)
     ) {
@@ -188,10 +203,12 @@ private fun BookListItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
-                modifier = Modifier.size(width = 64.dp, height = 96.dp),
+                modifier = Modifier
+                    .size(width = 72.dp, height = 104.dp)
+                    .background(MaterialTheme.colorScheme.primaryContainer, MaterialTheme.shapes.medium),
                 contentAlignment = Alignment.Center
-            ) { Text("📖", style = MaterialTheme.typography.headlineLarge) }
-            Spacer(modifier = Modifier.width(12.dp))
+            ) { Text("📖", style = MaterialTheme.typography.headlineMedium) }
+            Spacer(modifier = Modifier.width(14.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = book.title,
@@ -202,18 +219,24 @@ private fun BookListItem(
                 Text(
                     text = book.author,
                     style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = formatPrice(book.price),
-                    style = MaterialTheme.typography.titleSmall
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary
                 )
-                if (book.stock <= 0) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Surface(
+                    color = if (book.stock > 0) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.errorContainer,
+                    shape = MaterialTheme.shapes.small
+                ) {
                     Text(
-                        text = "Agotado",
-                        color = MaterialTheme.colorScheme.error,
+                        text = if (book.stock > 0) "Disponible" else "Agotado",
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
                         style = MaterialTheme.typography.labelMedium
                     )
                 }

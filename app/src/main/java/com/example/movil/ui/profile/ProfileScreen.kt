@@ -1,6 +1,12 @@
 package com.example.movil.ui.profile
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -8,56 +14,57 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.movil.ui.auth.UiState
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel,
     onEditProfile: () -> Unit,
     onChangePassword: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onBack: () -> Unit
 ) {
     val state by viewModel.profileState.collectAsState()
+    LaunchedEffect(Unit) { viewModel.loadProfile() }
 
-    LaunchedEffect(Unit) {
-        viewModel.loadProfile()
-    }
-
-    Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Perfil de Usuario", style = MaterialTheme.typography.headlineLarge)
-        Spacer(Modifier.height(24.dp))
-
-        when (state) {
-            is UiState.Loading -> CircularProgressIndicator()
-            is UiState.Success -> {
-                val user = (state as UiState.Success).data
-                Text("Usuario: ${user.userName ?: "N/A"}", style = MaterialTheme.typography.bodyLarge)
-                Spacer(Modifier.height(8.dp))
-                Text("Email: ${user.email ?: "N/A"}", style = MaterialTheme.typography.bodyLarge)
-                Spacer(Modifier.height(24.dp))
-
-                Button(onClick = onEditProfile, modifier = Modifier.fillMaxWidth()) {
-                    Text("Editar Perfil")
+    Scaffold(topBar = {
+        TopAppBar(title = { Text("Mi perfil") }, navigationIcon = {
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Volver") }
+        })
+    }) { padding ->
+        Box(Modifier.fillMaxSize().padding(padding).padding(20.dp)) {
+            when (state) {
+                is UiState.Loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
+                is UiState.Success -> {
+                    val user = (state as UiState.Success).data
+                    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Surface(color = MaterialTheme.colorScheme.primaryContainer, shape = MaterialTheme.shapes.large) {
+                            Icon(Icons.Default.Person, null, Modifier.padding(20.dp).size(48.dp))
+                        }
+                        Spacer(Modifier.height(14.dp))
+                        Text(user.userName ?: "Usuario", style = MaterialTheme.typography.headlineSmall)
+                        Text(user.email ?: "", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Spacer(Modifier.height(28.dp))
+                        ElevatedCard(Modifier.fillMaxWidth()) {
+                            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                Button(onClick = onEditProfile, modifier = Modifier.fillMaxWidth()) {
+                                    Icon(Icons.Default.Edit, null); Spacer(Modifier.width(8.dp)); Text("Editar datos")
+                                }
+                                FilledTonalButton(onClick = onChangePassword, modifier = Modifier.fillMaxWidth()) {
+                                    Icon(Icons.Default.Lock, null); Spacer(Modifier.width(8.dp)); Text("Cambiar contraseña")
+                                }
+                                OutlinedButton(onClick = { viewModel.logout(onLogout) }, modifier = Modifier.fillMaxWidth()) {
+                                    Icon(Icons.AutoMirrored.Filled.Logout, null); Spacer(Modifier.width(8.dp)); Text("Cerrar sesión")
+                                }
+                            }
+                        }
+                    }
                 }
-                Spacer(Modifier.height(8.dp))
-                Button(onClick = onChangePassword, modifier = Modifier.fillMaxWidth()) {
-                    Text("Cambiar Contraseña")
+                is UiState.Error -> Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text((state as UiState.Error).message, color = MaterialTheme.colorScheme.error)
+                    Button(onClick = viewModel::loadProfile) { Text("Reintentar") }
                 }
-                Spacer(Modifier.height(16.dp))
-                OutlinedButton(
-                    onClick = { viewModel.logout(onLogout) },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Cerrar Sesión")
-                }
+                else -> Unit
             }
-            is UiState.Error -> {
-                Text((state as UiState.Error).message, color = MaterialTheme.colorScheme.error)
-                Spacer(Modifier.height(8.dp))
-                Button(onClick = { viewModel.loadProfile() }) { Text("Reintentar") }
-            }
-            else -> {}
         }
     }
 }
