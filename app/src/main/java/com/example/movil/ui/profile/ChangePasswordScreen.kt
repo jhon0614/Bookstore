@@ -1,87 +1,68 @@
-// ChangePasswordScreen.kt — cambia la contraseña del usuario autenticado.
 package com.example.movil.ui.profile
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import com.example.movil.data.model.ChangePasswordRequest
-import com.example.movil.data.remote.RetrofitClient
-import com.example.movil.data.session.Session
-import kotlinx.coroutines.launch
+import com.example.movil.ui.auth.UiState
 
 @Composable
-fun ChangePasswordScreen(navController: NavController) {
-    var actual by remember { mutableStateOf("") } // contraseña actual
-    var nueva by remember { mutableStateOf("") }  // contraseña nueva
-    var result by remember { mutableStateOf("") }
-    var loading by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
+fun ChangePasswordScreen(
+    viewModel: ProfileViewModel,
+    onBack: () -> Unit
+) {
+    var currentPass by remember { mutableStateOf("") }
+    var newPass by remember { mutableStateOf("") }
+    val actionState by viewModel.actionState.collectAsState()
 
-    Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
-        Text("Cambiar contraseña", fontSize = 24.sp)
-        Spacer(Modifier.height(24.dp))
+    LaunchedEffect(actionState) {
+        if (actionState is UiState.Success) {
+            viewModel.resetActionState()
+            onBack()
+        }
+    }
+
+    Column(
+        modifier = Modifier.fillMaxSize().padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("Cambiar Contraseña", style = MaterialTheme.typography.headlineMedium)
+        Spacer(Modifier.height(16.dp))
 
         OutlinedTextField(
-            value = actual,
-            onValueChange = { actual = it },
-            label = { Text("Contraseña actual") },
-            singleLine = true,
+            value = currentPass,
+            onValueChange = { currentPass = it },
+            label = { Text("Contraseña Actual") },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
         )
-
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(8.dp))
 
         OutlinedTextField(
-            value = nueva,
-            onValueChange = { nueva = it },
-            label = { Text("Nueva contraseña") },
-            singleLine = true,
+            value = newPass,
+            onValueChange = { newPass = it },
+            label = { Text("Nueva Contraseña") },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
         )
+        Spacer(Modifier.height(16.dp))
 
-        Spacer(Modifier.height(24.dp))
-
-        Button(
-            onClick = {
-                if (actual.isBlank() || nueva.isBlank()) {
-                    result = "Completa los dos campos"
-                    return@Button
-                }
-                loading = true
-                result = ""
-                scope.launch {
-                    try {
-                        val resp = RetrofitClient.api.changePassword(
-                            Session.bearer(), ChangePasswordRequest(actual, nueva)
-                        )
-                        result = when {
-                            resp.isSuccessful -> "✅ Contraseña cambiada"
-                            resp.code() == 400 -> "❌ La contraseña actual es incorrecta"
-                            else -> "❌ Error (código ${resp.code()})"
-                        }
-                    } catch (e: Exception) {
-                        result = "⚠️ ${e.message}"
-                    } finally {
-                        loading = false
-                    }
-                }
-            },
-            enabled = !loading,
-            modifier = Modifier.fillMaxWidth()
-        ) { Text("Actualizar") }
-
-        if (result.isNotEmpty()) {
-            Spacer(Modifier.height(16.dp))
-            Text(result)
+        if (actionState is UiState.Loading) {
+            CircularProgressIndicator()
+        } else {
+            Button(
+                onClick = { if (currentPass.isNotBlank() && newPass.isNotBlank()) viewModel.changePassword(currentPass, newPass) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Actualizar Contraseña")
+            }
         }
 
-        TextButton(onClick = { navController.popBackStack() }) { Text("Volver") }
+        if (actionState is UiState.Error) {
+            Text((actionState as UiState.Error).message, color = MaterialTheme.colorScheme.error)
+        }
     }
 }

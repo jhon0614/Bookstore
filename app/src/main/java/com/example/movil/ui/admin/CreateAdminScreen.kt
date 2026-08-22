@@ -1,4 +1,4 @@
-package com.example.movil.ui.auth
+package com.example.movil.ui.admin
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -7,31 +7,39 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.movil.ui.auth.UiState
 
 @Composable
-fun LoginScreen(
-    viewModel: AuthViewModel,
-    onLoginSuccess: () -> Unit,
-    onNavigateToRegister: () -> Unit
+fun CreateAdminScreen(
+    viewModel: AdminViewModel,
+    onBack: () -> Unit
 ) {
+    var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    val state by viewModel.authState.collectAsState()
+    val state by viewModel.createAdminState.collectAsState()
 
     LaunchedEffect(state) {
         if (state is UiState.Success) {
-            viewModel.resetState()
-            onLoginSuccess()
+            viewModel.resetCreateState()
+            onBack()
         }
     }
 
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Iniciar Sesión", style = MaterialTheme.typography.headlineLarge)
+        Text("Crear Administrador", style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = name,
+            onValueChange = { name = it },
+            label = { Text("Nombre") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(Modifier.height(8.dp))
 
         OutlinedTextField(
             value = email,
@@ -54,19 +62,19 @@ fun LoginScreen(
             CircularProgressIndicator()
         } else {
             Button(
-                onClick = { if (email.isNotBlank() && password.isNotBlank()) viewModel.login(email, password) },
+                onClick = {
+                    if (name.isNotBlank() && email.isNotBlank() && password.isNotBlank()) {
+                        viewModel.createAdmin(name, email, password)
+                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Ingresar")
+                Text("Guardar Administrador")
             }
         }
 
         if (state is UiState.Error) {
-            Text((state as UiState.Error).message, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 8.dp))
-        }
-
-        TextButton(onClick = onNavigateToRegister) {
-            Text("¿No tienes cuenta? Regístrate")
+            Text((state as UiState.Error).message, color = MaterialTheme.colorScheme.error)
         }
     }
 }

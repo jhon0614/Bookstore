@@ -1,37 +1,43 @@
-// RetrofitClient.kt — crea y configura UNA sola instancia de Retrofit para toda la app.
-// "object" en Kotlin = singleton: existe una única copia, accesible como RetrofitClient.api
-
 package com.example.movil.data.remote
 
+import android.content.Context
+import com.example.movil.data.session.SessionManager
+import kotlinx.coroutines.runBlocking
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor    	// imprime en Logcat lo que se envía/recibe
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory // traduce JSON <-> objetos Kotlin
+import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
+    private const val BASE_URL = "https://your-backend-api-url.com/" // Cambiar según backend
 
-    // 10.0.2.2 es la dirección que, DESDE EL EMULADOR, apunta a "localhost" de tu
-    // computador (donde corre el backend de Python). La URL debe terminar en "/".
-    // 10.0.2.2 permite que el emulador llegue al localhost del computador.
-    // Retrofit exige que la URL base termine en "/".
-    private const val BASE_URL = "http://10.127.120.229:5050/"
+    fun getApiService(context: Context): ApiService {
+        val sessionManager = SessionManager(context)
 
-    // Interceptor: "espía" cada petición y su respuesta y las escribe en Logcat.
-    // Level.BODY = muestra encabezados y cuerpo completos (muy útil para depurar).
-    private val logging = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY
+        val client = OkHttpClient.Builder().addInterceptor(Interceptor { chain ->
+            val token = runBlocking { sessionManager.getTokenSync() }
+            val requestBuilder = chain.request().newBuilder()
+
+            if (!token.isNull_or_Empty()) {
+                requestBuilder.addHeader("Authorization", "Bearer $token")
+            }
+
+            val response = chain.proceed(requestBuilder.build())
+
+            if (response.code == 401) {
+                runBlocking { sessionManager.clearSession() }
+            }
+
+            response
+        }).build()
+
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ApiService::class.java)
     }
-
-    // Cliente HTTP con el interceptor conectado.
-    private val client = OkHttpClient.Builder()
-        .addInterceptor(logging)
-        .build()
-
-    // Construcción de Retrofit y creación del ApiService listo para usar.
-    val api: ApiService = Retrofit.Builder()
-        .baseUrl(BASE_URL)                              	// a dónde apuntan las peticiones
-        .client(client)                                 	// usar el cliente con logging
-        .addConverterFactory(GsonConverterFactory.create()) // activar traducción JSON
-        .build()                                        	// arma el objeto Retrofit
-        .create(ApiService::class.java)                 	// genera la implementación
 }
+
+private fun String?.isNull_or_Empty(): Boolean = this == null || this.isEmpty()

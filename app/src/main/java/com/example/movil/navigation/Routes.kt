@@ -1,16 +1,17 @@
 package com.example.movil.navigation
 
-object Routes {
-    const val LOGIN = "login"
-    const val REGISTER = "register"
-    const val HOME = "home"
-    const val EDIT_PROFILE = "editProfile"
-    const val PROFILE = "profile"
-    const val CHANGE_PASSWORD = "changePassword"
-    const val USERS = "users"
-    const val BOOKS = "books"
-    const val BOOK_DETAIL = "book/{bookId}"
-    const val CART = "cart"
-    const val ORDERS = "orders"
-    const val ORDER_DETAIL = "order/{orderId}"
+sealed class Routes(val route: String) {
+    object Login : Routes("login")
+    object Register : Routes("register")
+    object Home : Routes("home")
+    object Profile : Routes("profile")
+    object EditProfile : Routes("edit_profile")
+    object ChangePassword : Routes("change_password")
+    object AdminUsers : Routes("admin_users")
+    object CreateAdmin : Routes("create_admin")
+
+    // Placeholders para tus compañeros de equipo
+    object Books : Routes("books")
+    object Cart : Routes("cart")
+    object Orders : Routes("orders")
 }
