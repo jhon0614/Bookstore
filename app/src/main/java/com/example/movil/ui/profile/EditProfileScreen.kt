@@ -15,7 +15,20 @@ fun EditProfileScreen(
 ) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
+    val profileState by viewModel.profileState.collectAsState()
     val actionState by viewModel.actionState.collectAsState()
+
+    LaunchedEffect(profileState) {
+        val profile = (profileState as? UiState.Success)?.data
+        if (profile != null) {
+            name = profile.userName
+            email = profile.email
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        if (profileState !is UiState.Success) viewModel.loadProfile()
+    }
 
     LaunchedEffect(actionState) {
         if (actionState is UiState.Success) {

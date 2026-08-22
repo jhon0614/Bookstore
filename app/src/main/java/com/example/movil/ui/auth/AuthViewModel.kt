@@ -33,8 +33,9 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 val res = api.login(LoginRequest(email, pass))
                 if (res.isSuccessful && res.body() != null) {
                     val token = res.body()!!.token
-                    val role = res.body()!!.role ?: "client"
-                    session.saveSession(token, role)
+                    val user = res.body()!!.user
+                    val role = if (user.roles.any { it.name == "Administrador" }) "admin" else "client"
+                    session.saveSession(token, role, user.id.toString())
                     _authState.value = UiState.Success("Login exitoso")
                 } else {
                     _authState.value = UiState.Error("Credenciales inválidas (Err ${res.code()})")
@@ -52,7 +53,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 val res = api.register(RegisterRequest(userName = name, email = email, passwordKey = pass))
                 if (res.isSuccessful && res.body() != null) {
                     val token = res.body()!!.token
-                    session.saveSession(token, "client")
+                    val user = res.body()!!.user
+                    session.saveSession(token, "client", user.id.toString())
                     _authState.value = UiState.Success("Registro exitoso")
                 } else {
                     _authState.value = UiState.Error("Falló el registro: ${res.code()}")

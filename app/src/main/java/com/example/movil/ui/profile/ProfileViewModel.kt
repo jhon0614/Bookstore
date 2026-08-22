@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.movil.data.model.ChangePasswordRequest
 import com.example.movil.data.model.UserProfile
+import com.example.movil.data.model.UpdateProfileRequest
 import com.example.movil.data.remote.RetrofitClient
 import com.example.movil.data.session.SessionManager
 import com.example.movil.ui.auth.UiState
@@ -28,7 +29,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
             try {
                 val res = api.getProfile()
                 if (res.isSuccessful && res.body() != null) {
-                    _profileState.value = UiState.Success(res.body()!!)
+                    _profileState.value = UiState.Success(res.body()!!.user)
                 } else {
                     _profileState.value = UiState.Error("Error al cargar perfil: ${res.code()}")
                 }
@@ -42,8 +43,9 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch {
             _actionState.value = UiState.Loading
             try {
-                val res = api.updateProfile(UserProfile(id = null, userName = userName, email = email))
-                if (res.isSuccessful) {
+                val res = api.updateProfile(UpdateProfileRequest(userName, email))
+                if (res.isSuccessful && res.body() != null) {
+                    _profileState.value = UiState.Success(res.body()!!.user)
                     _actionState.value = UiState.Success("Perfil actualizado")
                 } else {
                     _actionState.value = UiState.Error("Error al actualizar: ${res.code()}")

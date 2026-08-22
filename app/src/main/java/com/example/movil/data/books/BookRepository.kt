@@ -37,10 +37,10 @@ class BooksRepository(
     }
 
     suspend fun getBookDetail(bookId: Int): Book =
-        api.getBookById(bookId)
+        api.getBookById(bookId).book
 
     suspend fun getCategories(): List<Category> =
-        api.getCategories()
+        api.getCategories().categories
 
     companion object {
         /**

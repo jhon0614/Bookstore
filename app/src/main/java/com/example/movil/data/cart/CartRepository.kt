@@ -1,13 +1,16 @@
 package com.example.movil.data.cart
 
-import com.example.movil.data.session.Session
+import android.content.Context
+import com.example.movil.data.remote.RetrofitClient
+import com.example.movil.data.session.SessionManager
 import org.json.JSONObject
 import retrofit2.Response
 
 class CartRepository(
-    private val api: CartApiService = BookstoreApiFactory.cartApi,
-    private val tokenProvider: () -> String? = { Session.token }
+    context: Context,
+    private val api: CartApiService = RetrofitClient.getCartApiService(context)
 ) {
+    private val session = SessionManager(context.applicationContext)
     suspend fun getCart(): DataResult<CartResponse> = execute { api.getCart(authorization()) }
 
     suspend fun addItem(bookId: Int, quantity: Int): DataResult<CartMutationResponse> {
@@ -25,8 +28,8 @@ class CartRepository(
 
     suspend fun clearCart(): DataResult<ApiMessage> = execute { api.clearCart(authorization()) }
 
-    private fun authorization(): String {
-        val token = tokenProvider()?.takeIf { it.isNotBlank() }
+    private suspend fun authorization(): String {
+        val token = session.getTokenSync()?.takeIf { it.isNotBlank() }
             ?: throw IllegalStateException("No hay una sesión activa")
         return "Bearer $token"
     }

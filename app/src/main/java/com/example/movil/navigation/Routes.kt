@@ -10,8 +10,14 @@ sealed class Routes(val route: String) {
     object AdminUsers : Routes("admin_users")
     object CreateAdmin : Routes("create_admin")
 
-    // Placeholders para tus compañeros de equipo
     object Books : Routes("books")
+    object BookDetail : Routes("book/{bookId}") {
+        fun create(bookId: Int) = "book/$bookId"
+    }
     object Cart : Routes("cart")
+    object Checkout : Routes("checkout")
     object Orders : Routes("orders")
+    object OrderDetail : Routes("order/{orderId}") {
+        fun create(orderId: Int) = "order/$orderId"
+    }
 }

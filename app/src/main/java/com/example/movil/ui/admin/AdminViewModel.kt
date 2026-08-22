@@ -24,13 +24,9 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             _usersState.value = UiState.Loading
             try {
-                val res = if (query.isEmpty()) api.getUsers() else api.searchUsers(query)
+                val res = if (query.isBlank()) api.getUsers() else api.searchUsers(query)
                 if (res.isSuccessful) {
-                    val list = if (query.isEmpty()) {
-                        (res.body() as? com.example.movil.data.model.UserPageResponse)?.users ?: emptyList()
-                    } else {
-                        (res.body() as? List<*>)?.filterIsInstance<UserProfile>() ?: emptyList()
-                    }
+                    val list = res.body()?.users ?: emptyList()
 
                     if (list.isEmpty()) {
                         _usersState.value = UiState.Empty
@@ -62,7 +58,7 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun deleteUser(id: String) {
+    fun deleteUser(id: Int) {
         viewModelScope.launch {
             try {
                 val res = api.deleteUser(id)

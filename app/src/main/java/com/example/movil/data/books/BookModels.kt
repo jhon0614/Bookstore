@@ -51,3 +51,6 @@ data class BooksResponse(
     val books: List<Book>,
     val pagination: Pagination
 )
+
+data class BookResponse(val book: Book)
+data class CategoriesResponse(val categories: List<Category> = emptyList(), val count: Int = 0)

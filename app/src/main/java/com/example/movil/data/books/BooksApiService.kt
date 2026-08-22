@@ -38,8 +38,8 @@ interface BooksApiService {
     @GET("api/books/{id}")
     suspend fun getBookById(
         @Path("id") id: Int
-    ): Book
+    ): BookResponse
 
     @GET("api/categories/")
-    suspend fun getCategories(): List<Category>
+    suspend fun getCategories(): CategoriesResponse
 }

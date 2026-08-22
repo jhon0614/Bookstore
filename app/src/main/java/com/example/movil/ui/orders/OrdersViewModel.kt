@@ -1,6 +1,7 @@
 package com.example.movil.ui.orders
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.movil.data.cart.DataResult
 import com.example.movil.data.orders.OrdersRepository
@@ -10,9 +11,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class OrdersViewModel(
-    private val repository: OrdersRepository = OrdersRepository()
-) : ViewModel() {
+class OrdersViewModel(application: Application) : AndroidViewModel(application) {
+    private val repository = OrdersRepository(application)
     private val _uiState = MutableStateFlow(OrdersUiState())
     val uiState: StateFlow<OrdersUiState> = _uiState.asStateFlow()
 

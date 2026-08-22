@@ -18,10 +18,10 @@ interface ApiService {
     suspend fun changePassword(@Body request: ChangePasswordRequest): Response<ApiMessageResponse>
 
     @GET("api/users/profile")
-    suspend fun getProfile(): Response<UserProfile>
+    suspend fun getProfile(): Response<ProfileResponse>
 
     @PUT("api/users/profile")
-    suspend fun updateProfile(@Body profile: UserProfile): Response<UserProfile>
+    suspend fun updateProfile(@Body profile: UpdateProfileRequest): Response<ProfileResponse>
 
     @GET("api/users/")
     suspend fun getUsers(
@@ -31,11 +31,11 @@ interface ApiService {
     ): Response<UserPageResponse>
 
     @GET("api/users/search")
-    suspend fun searchUsers(@Query("q") query: String): Response<List<UserProfile>>
+    suspend fun searchUsers(@Query("q") query: String): Response<UserPageResponse>
 
     @POST("api/users/admins")
     suspend fun createAdmin(@Body request: CreateAdminRequest): Response<ApiMessageResponse>
 
     @DELETE("api/users/{id}")
-    suspend fun deleteUser(@Path("id") id: String): Response<ApiMessageResponse>
+    suspend fun deleteUser(@Path("id") id: Int): Response<ApiMessageResponse>
 }

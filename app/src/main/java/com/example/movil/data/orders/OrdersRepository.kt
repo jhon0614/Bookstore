@@ -1,14 +1,16 @@
 package com.example.movil.data.orders
 
-import com.example.movil.data.cart.BookstoreApiFactory
+import android.content.Context
 import com.example.movil.data.cart.DataResult
 import com.example.movil.data.cart.execute
-import com.example.movil.data.session.Session
+import com.example.movil.data.remote.RetrofitClient
+import com.example.movil.data.session.SessionManager
 
 class OrdersRepository(
-    private val api: OrdersApiService = BookstoreApiFactory.create(OrdersApiService::class.java),
-    private val tokenProvider: () -> String? = { Session.token }
+    context: Context,
+    private val api: OrdersApiService = RetrofitClient.getOrdersApiService(context)
 ) {
+    private val session = SessionManager(context.applicationContext)
     suspend fun checkout(method: PaymentMethod): DataResult<CheckoutResponse> =
         execute { api.checkout(authorization(), CheckoutRequest(method.apiValue)) }
 
@@ -18,8 +20,8 @@ class OrdersRepository(
     suspend fun getOrder(orderId: Int): DataResult<OrderResponse> =
         execute { api.getOrder(authorization(), orderId) }
 
-    private fun authorization(): String {
-        val token = tokenProvider()?.takeIf { it.isNotBlank() }
+    private suspend fun authorization(): String {
+        val token = session.getTokenSync()?.takeIf { it.isNotBlank() }
             ?: throw IllegalStateException("No hay una sesión activa")
         return "Bearer $token"
     }

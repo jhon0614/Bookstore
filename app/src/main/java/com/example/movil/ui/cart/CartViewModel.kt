@@ -1,6 +1,7 @@
 package com.example.movil.ui.cart
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.movil.data.cart.CartRepository
 import com.example.movil.data.cart.CartResponse
@@ -10,9 +11,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class CartViewModel(
-    private val repository: CartRepository = CartRepository()
-) : ViewModel() {
+class CartViewModel(application: Application) : AndroidViewModel(application) {
+    private val repository = CartRepository(application)
     private val _uiState = MutableStateFlow(CartUiState())
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
 

@@ -1,43 +1,53 @@
 package com.example.movil.data.remote
 
 import android.content.Context
+import com.example.movil.data.books.BooksApiService
+import com.example.movil.data.cart.CartApiService
+import com.example.movil.data.orders.OrdersApiService
 import com.example.movil.data.session.SessionManager
 import kotlinx.coroutines.runBlocking
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    private const val BASE_URL = "https://your-backend-api-url.com/" // Cambiar según backend
+    // Emulador Android. Para celular físico, usar aquí la IP local del computador.
+    private const val BASE_URL = "http://10.127.120.229:5050/"
 
-    fun getApiService(context: Context): ApiService {
-        val sessionManager = SessionManager(context)
+    @Volatile private var retrofitInstance: Retrofit? = null
 
-        val client = OkHttpClient.Builder().addInterceptor(Interceptor { chain ->
-            val token = runBlocking { sessionManager.getTokenSync() }
-            val requestBuilder = chain.request().newBuilder()
+    private fun retrofit(context: Context): Retrofit {
+        return retrofitInstance ?: synchronized(this) {
+            retrofitInstance ?: buildRetrofit(context.applicationContext).also { retrofitInstance = it }
+        }
+    }
 
-            if (!token.isNull_or_Empty()) {
-                requestBuilder.addHeader("Authorization", "Bearer $token")
+    private fun buildRetrofit(context: Context): Retrofit {
+        val session = SessionManager(context)
+        val logging = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BASIC }
+        val client = OkHttpClient.Builder()
+            .addInterceptor { chain ->
+                val token = runBlocking { session.getTokenSync() }
+                val request = chain.request().newBuilder().apply {
+                    if (!token.isNullOrBlank()) header("Authorization", "Bearer $token")
+                }.build()
+                chain.proceed(request).also { response ->
+                    if (response.code == 401) runBlocking { session.clearSession() }
+                }
             }
-
-            val response = chain.proceed(requestBuilder.build())
-
-            if (response.code == 401) {
-                runBlocking { sessionManager.clearSession() }
-            }
-
-            response
-        }).build()
+            .addInterceptor(logging)
+            .build()
 
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(ApiService::class.java)
     }
-}
 
-private fun String?.isNull_or_Empty(): Boolean = this == null || this.isEmpty()
+    fun getApiService(context: Context): ApiService = retrofit(context).create(ApiService::class.java)
+    fun getBooksApiService(context: Context): BooksApiService = retrofit(context).create(BooksApiService::class.java)
+    fun getCartApiService(context: Context): CartApiService = retrofit(context).create(CartApiService::class.java)
+    fun getOrdersApiService(context: Context): OrdersApiService = retrofit(context).create(OrdersApiService::class.java)
+}

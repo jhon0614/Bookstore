@@ -20,6 +20,9 @@ class SessionManager(private val context: Context) {
 
     val authToken: Flow<String?> = context.sessionDataStore.data.map { pref -> pref[TOKEN_KEY] }
     val userRole: Flow<String?> = context.sessionDataStore.data.map { pref -> pref[ROLE_KEY] }
+    val session: Flow<SessionData> = context.sessionDataStore.data.map { pref ->
+        SessionData(pref[TOKEN_KEY], pref[ROLE_KEY])
+    }
 
     suspend fun saveSession(token: String, role: String = "client", userId: String = "") {
         context.sessionDataStore.edit { pref ->
@@ -37,3 +40,5 @@ class SessionManager(private val context: Context) {
         context.sessionDataStore.edit { pref -> pref.clear() }
     }
 }
+
+data class SessionData(val token: String?, val role: String?)

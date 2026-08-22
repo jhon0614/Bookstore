@@ -15,28 +15,26 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallTopAppBar
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
 import com.example.movil.data.books.Book
 
 /**
@@ -57,14 +55,14 @@ fun BookDetailScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            SmallTopAppBar(
+            TopAppBar(
                 title = { Text("Detalle del libro") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                 },
-                colors = TopAppBarDefaults.smallTopAppBarColors()
+                colors = TopAppBarDefaults.topAppBarColors()
             )
         }
     ) { paddingValues ->
@@ -120,14 +118,12 @@ private fun BookDetailContent(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        AsyncImage(
-            model = book.coverUrl,
-            contentDescription = book.title,
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(280.dp),
-            contentScale = ContentScale.Fit
-        )
+            contentAlignment = Alignment.Center
+        ) { Text("📖", style = MaterialTheme.typography.displayLarge) }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -166,7 +162,7 @@ private fun BookDetailContent(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-        Divider()
+        HorizontalDivider()
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(text = "Género: ${book.genre}", style = MaterialTheme.typography.bodyMedium)

@@ -11,7 +11,10 @@ import androidx.compose.ui.unit.dp
 fun HomeScreen(
     isAdmin: Boolean,
     onNavigateToProfile: () -> Unit,
-    onNavigateToUsers: () -> Unit
+    onNavigateToUsers: () -> Unit,
+    onNavigateToBooks: () -> Unit,
+    onNavigateToCart: () -> Unit,
+    onNavigateToOrders: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp),
@@ -24,6 +27,12 @@ fun HomeScreen(
         Button(onClick = onNavigateToProfile, modifier = Modifier.fillMaxWidth()) {
             Text("Ver mi perfil")
         }
+        Spacer(Modifier.height(8.dp))
+        Button(onClick = onNavigateToBooks, modifier = Modifier.fillMaxWidth()) { Text("Explorar libros") }
+        Spacer(Modifier.height(8.dp))
+        Button(onClick = onNavigateToCart, modifier = Modifier.fillMaxWidth()) { Text("Mi carrito") }
+        Spacer(Modifier.height(8.dp))
+        Button(onClick = onNavigateToOrders, modifier = Modifier.fillMaxWidth()) { Text("Mis pedidos") }
 
         if (isAdmin) {
             Spacer(Modifier.height(8.dp))

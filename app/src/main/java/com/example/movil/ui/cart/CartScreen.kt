@@ -25,6 +25,7 @@ fun CartScreen(
     val state by viewModel.uiState.collectAsState()
     var confirmClear by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) { viewModel.loadCart() }
     LaunchedEffect(state.unauthorized) { if (state.unauthorized) onUnauthorized() }
 
     Scaffold(
