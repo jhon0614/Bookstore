@@ -1,11 +1,5 @@
 package com.example.movil.data.books
 
-import retrofit2.Retrofit
-
-/**
- * Repositorio del módulo de libros. El ViewModel nunca llama a Retrofit
- * directamente; siempre pasa por aquí.
- */
 class BooksRepository(
     private val api: BooksApiService
 ) {
@@ -41,26 +35,4 @@ class BooksRepository(
 
     suspend fun getCategories(): List<Category> =
         api.getCategories().categories
-
-    companion object {
-        /**
-         * Fábrica auxiliar para construir el repositorio a partir de un
-         * Retrofit ya configurado (el que expone RetrofitClient.kt).
-         *
-         * Uso típico en el composable/NavHost (archivo que NO pertenece a
-         * este módulo, lo arma quien conecte la navegación):
-         *
-         *   val repository = remember {
-         *       BooksRepository.create(RetrofitClient.retrofit)
-         *   }
-         *
-         * Reemplaza "RetrofitClient.retrofit" por el nombre real de la
-         * propiedad que expone tu instancia de Retrofit. Ver sección
-         * "Cambio requerido en RetrofitClient.kt" de la respuesta.
-         */
-        fun create(retrofit: Retrofit): BooksRepository {
-            val api = retrofit.create(BooksApiService::class.java)
-            return BooksRepository(api)
-        }
-    }
 }

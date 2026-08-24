@@ -42,14 +42,14 @@ fun UsersScreen(viewModel: AdminViewModel, onCreateAdmin: () -> Unit, onBack: ()
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(14.dp))
-            when (state) {
+            when (val currentState = state) {
                 is UiState.Loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
                 is UiState.Empty -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("No se encontraron usuarios") }
                 is UiState.Success -> LazyColumn(
                     contentPadding = PaddingValues(bottom = 96.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items((state as UiState.Success).data) { user ->
+                    items(currentState.data) { user ->
                         ElevatedCard(Modifier.fillMaxWidth()) {
                             Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Column(Modifier.weight(1f)) {
@@ -63,7 +63,7 @@ fun UsersScreen(viewModel: AdminViewModel, onCreateAdmin: () -> Unit, onBack: ()
                         }
                     }
                 }
-                is UiState.Error -> Text((state as UiState.Error).message, color = MaterialTheme.colorScheme.error)
+                is UiState.Error -> Text(currentState.message, color = MaterialTheme.colorScheme.error)
                 else -> Unit
             }
         }
