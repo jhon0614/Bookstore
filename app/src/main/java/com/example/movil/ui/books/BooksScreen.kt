@@ -192,9 +192,10 @@ private fun BookListItem(
     book: Book,
     onClick: () -> Unit
 ) {
-    ElevatedCard(modifier = Modifier
-        .fillMaxWidth()
-        .clickable(onClick = onClick)
+    ElevatedCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
     ) {
         Row(
             modifier = Modifier
@@ -205,7 +206,10 @@ private fun BookListItem(
             Box(
                 modifier = Modifier
                     .size(width = 72.dp, height = 104.dp)
-                    .background(MaterialTheme.colorScheme.primaryContainer, MaterialTheme.shapes.medium),
+                    .background(
+                        MaterialTheme.colorScheme.primaryContainer,
+                        MaterialTheme.shapes.medium
+                    ),
                 contentAlignment = Alignment.Center
             ) { Text("📖", style = MaterialTheme.typography.headlineMedium) }
             Spacer(modifier = Modifier.width(14.dp))

@@ -14,6 +14,7 @@ sealed class Routes(val route: String) {
     object BookDetail : Routes("book/{bookId}") {
         fun create(bookId: Int) = "book/$bookId"
     }
+
     object Cart : Routes("cart")
     object Checkout : Routes("checkout")
     object Orders : Routes("orders")

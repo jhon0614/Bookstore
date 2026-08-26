@@ -34,19 +34,33 @@ fun OrderDetailScreen(
             })
         }
     ) { padding ->
-        Box(Modifier.fillMaxSize().padding(padding).padding(16.dp)) {
+        Box(Modifier
+            .fillMaxSize()
+            .padding(padding)
+            .padding(16.dp)) {
             when {
                 state.isLoading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
-                state.error != null -> Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+                state.error != null -> Column(
+                    Modifier.align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Text(state.error!!, color = MaterialTheme.colorScheme.error)
                     Button(onClick = { viewModel.loadOrder(orderId) }) { Text("Reintentar") }
                 }
-                state.selectedOrder == null -> Text("Pedido no encontrado", Modifier.align(Alignment.Center))
+
+                state.selectedOrder == null -> Text(
+                    "Pedido no encontrado",
+                    Modifier.align(Alignment.Center)
+                )
+
                 else -> {
                     val order = state.selectedOrder!!
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         item {
-                            Text("Pedido #${order.id}", style = MaterialTheme.typography.headlineSmall)
+                            Text(
+                                "Pedido #${order.id}",
+                                style = MaterialTheme.typography.headlineSmall
+                            )
                             Text("Estado: ${order.status.replaceFirstChar { it.uppercase() }}")
                             Text("Fecha: ${readableDate(order.createdAt)}")
                             Text("Método de pago: ${order.paymentMethod.replaceFirstChar { it.uppercase() }}")
@@ -64,7 +78,10 @@ fun OrderDetailScreen(
                         }
                         item {
                             HorizontalDivider(Modifier.padding(vertical = 12.dp))
-                            Text("Total: ${money(order.total)}", style = MaterialTheme.typography.headlineSmall)
+                            Text(
+                                "Total: ${money(order.total)}",
+                                style = MaterialTheme.typography.headlineSmall
+                            )
                         }
                     }
                 }

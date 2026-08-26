@@ -39,41 +39,89 @@ fun CartScreen(
             })
         }
     ) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding).padding(16.dp)) {
+        Column(Modifier
+            .fillMaxSize()
+            .padding(padding)
+            .padding(16.dp)) {
             when {
-                state.isLoading && state.cart.items.isEmpty() -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                state.isLoading && state.cart.items.isEmpty() -> Box(
+                    Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
                     CircularProgressIndicator()
                 }
-                state.error != null && state.cart.items.isEmpty() -> ErrorContent(state.error!!, viewModel::loadCart)
-                state.cart.items.isEmpty() -> Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+
+                state.error != null && state.cart.items.isEmpty() -> ErrorContent(
+                    state.error!!,
+                    viewModel::loadCart
+                )
+
+                state.cart.items.isEmpty() -> Box(
+                    Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
                     Text("Tu carrito está vacío")
                 }
+
                 else -> {
-                    LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    LazyColumn(
+                        Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
                         items(state.cart.items, key = { it.id }) { item ->
                             CartItemCard(
                                 item = item,
                                 enabled = !state.isLoading,
-                                onQuantity = { viewModel.updateQuantity(item.id, it, item.book.stock) },
+                                onQuantity = {
+                                    viewModel.updateQuantity(
+                                        item.id,
+                                        it,
+                                        item.book.stock
+                                    )
+                                },
                                 onRemove = { viewModel.removeItem(item.id) }
                             )
                         }
                     }
                     Spacer(Modifier.height(12.dp))
-                    Surface(color = MaterialTheme.colorScheme.primaryContainer, shape = MaterialTheme.shapes.large) {
-                        Row(Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        shape = MaterialTheme.shapes.large
+                    ) {
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
                             Column {
                                 Text("Resumen", style = MaterialTheme.typography.titleMedium)
-                                Text("${state.cart.count} ejemplares", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(
+                                    "${state.cart.count} ejemplares",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             }
-                            Text(money(state.cart.total), style = MaterialTheme.typography.headlineSmall)
+                            Text(
+                                money(state.cart.total),
+                                style = MaterialTheme.typography.headlineSmall
+                            )
                         }
                     }
                     Spacer(Modifier.height(12.dp))
-                    Button(onClick = onCheckout, modifier = Modifier.fillMaxWidth(), enabled = !state.isLoading) {
+                    Button(
+                        onClick = onCheckout,
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !state.isLoading
+                    ) {
                         Text("Continuar con el pago")
                     }
-                    TextButton(onClick = { confirmClear = true }, modifier = Modifier.fillMaxWidth(), enabled = !state.isLoading) {
+                    TextButton(
+                        onClick = { confirmClear = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !state.isLoading
+                    ) {
                         Text("Vaciar carrito")
                     }
                 }
@@ -89,20 +137,36 @@ fun CartScreen(
         onDismissRequest = { confirmClear = false },
         title = { Text("Vaciar carrito") },
         text = { Text("¿Deseas quitar todos los libros del carrito?") },
-        confirmButton = { TextButton(onClick = { confirmClear = false; viewModel.clearCart() }) { Text("Vaciar") } },
+        confirmButton = {
+            TextButton(onClick = {
+                confirmClear = false; viewModel.clearCart()
+            }) { Text("Vaciar") }
+        },
         dismissButton = { TextButton(onClick = { confirmClear = false }) { Text("Cancelar") } }
     )
 }
 
 @Composable
-private fun CartItemCard(item: CartItem, enabled: Boolean, onQuantity: (Int) -> Unit, onRemove: () -> Unit) {
+private fun CartItemCard(
+    item: CartItem,
+    enabled: Boolean,
+    onQuantity: (Int) -> Unit,
+    onRemove: () -> Unit
+) {
     ElevatedCard(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp)) {
             Text(item.book.title, style = MaterialTheme.typography.titleMedium)
-            Text(item.book.author, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                item.book.author,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             Text(money(item.book.price), color = MaterialTheme.colorScheme.primary)
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                OutlinedButton(onClick = { onQuantity(item.quantity - 1) }, enabled = enabled && item.quantity > 1) { Text("−") }
+                OutlinedButton(
+                    onClick = { onQuantity(item.quantity - 1) },
+                    enabled = enabled && item.quantity > 1
+                ) { Text("−") }
                 Text(item.quantity.toString(), modifier = Modifier.padding(horizontal = 16.dp))
                 OutlinedButton(
                     onClick = { onQuantity(item.quantity + 1) },
@@ -120,7 +184,11 @@ private fun CartItemCard(item: CartItem, enabled: Boolean, onQuantity: (Int) -> 
 
 @Composable
 private fun ErrorContent(message: String, retry: () -> Unit) {
-    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(message, color = MaterialTheme.colorScheme.error)
         Button(onClick = retry) { Text("Reintentar") }
     }

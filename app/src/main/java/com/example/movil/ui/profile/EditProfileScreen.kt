@@ -40,7 +40,9 @@ fun EditProfileScreen(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -71,7 +73,12 @@ fun EditProfileScreen(
             CircularProgressIndicator()
         } else {
             Button(
-                onClick = { if (name.isNotBlank() && email.isNotBlank()) viewModel.updateProfile(name, email) },
+                onClick = {
+                    if (name.isNotBlank() && email.isNotBlank()) viewModel.updateProfile(
+                        name,
+                        email
+                    )
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Guardar Cambios")

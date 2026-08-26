@@ -12,8 +12,7 @@ class OrdersRepository(
     suspend fun checkout(method: PaymentMethod): DataResult<CheckoutResponse> =
         execute { api.checkout(CheckoutRequest(method.apiValue)) }
 
-    suspend fun getOrders(): DataResult<OrdersResponse> =
-        execute { api.getOrders() }
+    suspend fun getOrders(): DataResult<OrdersResponse> = execute { api.getOrders() }
 
     suspend fun getOrder(orderId: Int): DataResult<OrderResponse> =
         execute { api.getOrder(orderId) }

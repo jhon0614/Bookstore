@@ -46,11 +46,18 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             _createAdminState.value = UiState.Loading
             try {
-                val res = api.createAdmin(CreateAdminRequest(userName = name, email = email, passwordKey = pass))
+                val res = api.createAdmin(
+                    CreateAdminRequest(
+                        userName = name,
+                        email = email,
+                        passwordKey = pass
+                    )
+                )
                 if (res.isSuccessful) {
                     _createAdminState.value = UiState.Success("Administrador creado correctamente")
                 } else {
-                    _createAdminState.value = UiState.Error("Error creando administrador (${res.code()})")
+                    _createAdminState.value =
+                        UiState.Error("Error creando administrador (${res.code()})")
                 }
             } catch (e: Exception) {
                 _createAdminState.value = UiState.Error(e.localizedMessage ?: "Error de red")
@@ -63,10 +70,13 @@ class AdminViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 val res = api.deleteUser(id)
                 if (res.isSuccessful) getUsers()
-            } catch (_: Exception) {}
+            } catch (_: Exception) {
+            }
         }
     }
 
-    fun resetCreateState() { _createAdminState.value = UiState.Idle }
+    fun resetCreateState() {
+        _createAdminState.value = UiState.Idle
+    }
 }
 

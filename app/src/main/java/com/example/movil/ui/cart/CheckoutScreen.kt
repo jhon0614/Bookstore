@@ -49,12 +49,23 @@ fun CheckoutScreen(
             })
         }
     ) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding).padding(16.dp)) {
-            Surface(color = MaterialTheme.colorScheme.primaryContainer, shape = MaterialTheme.shapes.large) {
-                Column(Modifier.fillMaxWidth().padding(18.dp)) {
+        Column(Modifier
+            .fillMaxSize()
+            .padding(padding)
+            .padding(16.dp)) {
+            Surface(
+                color = MaterialTheme.colorScheme.primaryContainer,
+                shape = MaterialTheme.shapes.large
+            ) {
+                Column(Modifier
+                    .fillMaxWidth()
+                    .padding(18.dp)) {
                     Text("Resumen de compra", style = MaterialTheme.typography.titleLarge)
                     Text("${cartState.cart.count} ejemplares")
-                    Text(money(cartState.cart.total), style = MaterialTheme.typography.headlineMedium)
+                    Text(
+                        money(cartState.cart.total),
+                        style = MaterialTheme.typography.headlineMedium
+                    )
                 }
             }
             Spacer(Modifier.height(24.dp))
@@ -76,7 +87,10 @@ fun CheckoutScreen(
                 enabled = cartState.cart.items.isNotEmpty() && !orderState.isLoading,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                if (orderState.isLoading) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
+                if (orderState.isLoading) CircularProgressIndicator(
+                    Modifier.size(20.dp),
+                    strokeWidth = 2.dp
+                )
                 else Text("Confirmar pedido")
             }
         }

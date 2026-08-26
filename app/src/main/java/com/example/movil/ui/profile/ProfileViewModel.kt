@@ -64,7 +64,8 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                 if (res.isSuccessful) {
                     _actionState.value = UiState.Success("Contraseña cambiada exitosamente")
                 } else {
-                    _actionState.value = UiState.Error("Contraseña actual incorrecta o formato inválido")
+                    _actionState.value =
+                        UiState.Error("Contraseña actual incorrecta o formato inválido")
                 }
             } catch (e: Exception) {
                 _actionState.value = UiState.Error(e.localizedMessage ?: "Error al conectar")
@@ -79,6 +80,8 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun resetActionState() { _actionState.value = UiState.Idle }
+    fun resetActionState() {
+        _actionState.value = UiState.Idle
+    }
 }
 

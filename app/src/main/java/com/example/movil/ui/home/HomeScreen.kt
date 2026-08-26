@@ -45,11 +45,19 @@ fun HomeScreen(
                 color = MaterialTheme.colorScheme.primaryContainer,
                 shape = MaterialTheme.shapes.large
             ) {
-                Row(Modifier.fillMaxWidth().padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text("📚", style = MaterialTheme.typography.displaySmall)
                     Spacer(Modifier.width(16.dp))
                     Column(Modifier.weight(1f)) {
-                        Text("Tu próxima lectura está aquí", style = MaterialTheme.typography.titleLarge)
+                        Text(
+                            "Tu próxima lectura está aquí",
+                            style = MaterialTheme.typography.titleLarge
+                        )
                         Text("Busca por autor, género, título o ISBN")
                     }
                 }
@@ -57,26 +65,55 @@ fun HomeScreen(
         }
 
         item {
-            HomeOption(Icons.AutoMirrored.Filled.MenuBook, "Explorar libros", "Descubre y filtra el catálogo", onNavigateToBooks)
+            HomeOption(
+                Icons.AutoMirrored.Filled.MenuBook,
+                "Explorar libros",
+                "Descubre y filtra el catálogo",
+                onNavigateToBooks
+            )
         }
         item {
-            HomeOption(Icons.Default.ShoppingCart, "Mi carrito", "Revisa los libros seleccionados", onNavigateToCart)
+            HomeOption(
+                Icons.Default.ShoppingCart,
+                "Mi carrito",
+                "Revisa los libros seleccionados",
+                onNavigateToCart
+            )
         }
         item {
-            HomeOption(Icons.AutoMirrored.Filled.ReceiptLong, "Mis pedidos", "Consulta compras y detalles", onNavigateToOrders)
+            HomeOption(
+                Icons.AutoMirrored.Filled.ReceiptLong,
+                "Mis pedidos",
+                "Consulta compras y detalles",
+                onNavigateToOrders
+            )
         }
         if (isLoggedIn) {
-            item { HomeOption(Icons.Default.Person, "Mi perfil", "Actualiza tus datos y contraseña", onNavigateToProfile) }
+            item {
+                HomeOption(
+                    Icons.Default.Person,
+                    "Mi perfil",
+                    "Actualiza tus datos y contraseña",
+                    onNavigateToProfile
+                )
+            }
         } else {
             item {
-                OutlinedButton(onClick = onNavigateToLogin, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) {
+                OutlinedButton(
+                    onClick = onNavigateToLogin,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 52.dp)
+                ) {
                     Icon(Icons.AutoMirrored.Filled.Login, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
                     Text("Iniciar sesión")
                 }
                 Text(
                     "También puedes comprar como invitado",
-                    modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 6.dp),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -91,22 +128,43 @@ fun HomeScreen(
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }
-            item { HomeOption(Icons.Default.AdminPanelSettings, "Gestionar usuarios", "Consulta usuarios y crea administradores", onNavigateToUsers) }
+            item {
+                HomeOption(
+                    Icons.Default.AdminPanelSettings,
+                    "Gestionar usuarios",
+                    "Consulta usuarios y crea administradores",
+                    onNavigateToUsers
+                )
+            }
         }
     }
 }
 
 @Composable
 private fun HomeOption(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit) {
-    ElevatedCard(Modifier.fillMaxWidth().clickable(onClick = onClick)) {
+    ElevatedCard(Modifier
+        .fillMaxWidth()
+        .clickable(onClick = onClick)) {
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Surface(color = MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.medium) {
-                Icon(icon, contentDescription = null, modifier = Modifier.padding(12.dp), tint = MaterialTheme.colorScheme.onSecondaryContainer)
+            Surface(
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    modifier = Modifier.padding(12.dp),
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer
+                )
             }
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
                 Text(title, style = MaterialTheme.typography.titleMedium)
-                Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
             Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null)
         }

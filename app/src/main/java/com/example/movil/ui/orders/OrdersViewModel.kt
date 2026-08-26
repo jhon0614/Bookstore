@@ -23,6 +23,7 @@ class OrdersViewModel(application: Application) : AndroidViewModel(application) 
                 is DataResult.Success -> _uiState.value = _uiState.value.copy(
                     isLoading = false, confirmedOrder = result.data.order
                 )
+
                 is DataResult.Error -> showError(result)
             }
         }
@@ -35,6 +36,7 @@ class OrdersViewModel(application: Application) : AndroidViewModel(application) 
                 is DataResult.Success -> _uiState.value = _uiState.value.copy(
                     isLoading = false, orders = result.data.orders
                 )
+
                 is DataResult.Error -> showError(result)
             }
         }
@@ -47,6 +49,7 @@ class OrdersViewModel(application: Application) : AndroidViewModel(application) 
                 is DataResult.Success -> _uiState.value = _uiState.value.copy(
                     isLoading = false, selectedOrder = result.data.order
                 )
+
                 is DataResult.Error -> showError(result)
             }
         }

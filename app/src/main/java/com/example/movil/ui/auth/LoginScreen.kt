@@ -34,15 +34,30 @@ fun LoginScreen(
 
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
-            Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(24.dp),
+            Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Surface(color = MaterialTheme.colorScheme.primaryContainer, shape = MaterialTheme.shapes.large) {
-                Icon(Icons.Default.AutoStories, contentDescription = null, modifier = Modifier.padding(18.dp).size(42.dp))
+            Surface(
+                color = MaterialTheme.colorScheme.primaryContainer,
+                shape = MaterialTheme.shapes.large
+            ) {
+                Icon(
+                    Icons.Default.AutoStories,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(18.dp)
+                        .size(42.dp)
+                )
             }
             Spacer(Modifier.height(16.dp))
             Text("Bienvenido a BookStore+", style = MaterialTheme.typography.headlineMedium)
-            Text("Inicia sesión para gestionar tu cuenta", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                "Inicia sesión para gestionar tu cuenta",
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             Spacer(Modifier.height(24.dp))
 
             ElevatedCard(Modifier.fillMaxWidth()) {
@@ -69,9 +84,14 @@ fun LoginScreen(
                     Button(
                         onClick = { viewModel.login(email.trim(), password) },
                         enabled = email.isNotBlank() && password.isNotBlank() && state !is UiState.Loading,
-                        modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 50.dp)
                     ) {
-                        if (state is UiState.Loading) CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 2.dp)
+                        if (state is UiState.Loading) CircularProgressIndicator(
+                            Modifier.size(22.dp),
+                            strokeWidth = 2.dp
+                        )
                         else {
                             Icon(Icons.AutoMirrored.Filled.Login, contentDescription = null)
                             Spacer(Modifier.width(8.dp))

@@ -33,21 +33,42 @@ fun RegisterScreen(
     }
 
     Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
+        Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Surface(color = MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.large) {
-            Icon(Icons.Default.PersonAdd, contentDescription = null, modifier = Modifier.padding(18.dp).size(42.dp))
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            shape = MaterialTheme.shapes.large
+        ) {
+            Icon(
+                Icons.Default.PersonAdd,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(18.dp)
+                    .size(42.dp)
+            )
         }
         Spacer(Modifier.height(16.dp))
         Text("Crea tu cuenta", style = MaterialTheme.typography.headlineMedium)
-        Text("Guarda tus datos y continúa leyendo", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            "Guarda tus datos y continúa leyendo",
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         Spacer(Modifier.height(24.dp))
 
         ElevatedCard(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                OutlinedTextField(name, { name = it }, label = { Text("Nombre") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(
+                    name,
+                    { name = it },
+                    label = { Text("Nombre") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
                 OutlinedTextField(
                     email, { email = it }, label = { Text("Correo electrónico") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -59,13 +80,23 @@ fun RegisterScreen(
                     visualTransformation = PasswordVisualTransformation(), singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
-                (state as? UiState.Error)?.let { Text(it.message, color = MaterialTheme.colorScheme.error) }
+                (state as? UiState.Error)?.let {
+                    Text(
+                        it.message,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
                 Button(
                     onClick = { viewModel.register(name.trim(), email.trim(), password) },
                     enabled = name.isNotBlank() && email.isNotBlank() && password.length >= 6 && state !is UiState.Loading,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 50.dp)
                 ) {
-                    if (state is UiState.Loading) CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 2.dp)
+                    if (state is UiState.Loading) CircularProgressIndicator(
+                        Modifier.size(22.dp),
+                        strokeWidth = 2.dp
+                    )
                     else Text("Crear cuenta")
                 }
             }

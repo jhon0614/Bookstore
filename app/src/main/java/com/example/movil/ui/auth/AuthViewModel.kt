@@ -34,7 +34,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 if (res.isSuccessful && res.body() != null) {
                     val token = res.body()!!.token
                     val user = res.body()!!.user
-                    val role = if (user.roles.any { it.name == "Administrador" }) "admin" else "client"
+                    val role =
+                        if (user.roles.any { it.name == "Administrador" }) "admin" else "client"
                     session.saveSession(token, role, user.id.toString())
                     _authState.value = UiState.Success("Login exitoso")
                 } else {
@@ -50,7 +51,13 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             _authState.value = UiState.Loading
             try {
-                val res = api.register(RegisterRequest(userName = name, email = email, passwordKey = pass))
+                val res = api.register(
+                    RegisterRequest(
+                        userName = name,
+                        email = email,
+                        passwordKey = pass
+                    )
+                )
                 if (res.isSuccessful && res.body() != null) {
                     val token = res.body()!!.token
                     val user = res.body()!!.user
@@ -65,6 +72,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun resetState() { _authState.value = UiState.Idle }
+    fun resetState() {
+        _authState.value = UiState.Idle
+    }
 }
 

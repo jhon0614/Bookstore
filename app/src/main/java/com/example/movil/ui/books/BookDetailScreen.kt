@@ -65,7 +65,9 @@ fun BookDetailScreen(
             }
         }
     ) { paddingValues ->
-        Box(Modifier.fillMaxSize().padding(paddingValues)) {
+        Box(Modifier
+            .fillMaxSize()
+            .padding(paddingValues)) {
             when (val state = uiState) {
                 BookDetailUiState.Loading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
                 is BookDetailUiState.Error -> ErrorDetail(state.message, viewModel::loadBook)
@@ -83,7 +85,9 @@ fun BookDetailScreen(
 @Composable
 private fun ErrorDetail(message: String, retry: () -> Unit) {
     Column(
-        Modifier.fillMaxSize().padding(24.dp),
+        Modifier
+            .fillMaxSize()
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -116,9 +120,17 @@ private fun BookDetailContent(
 
         Spacer(Modifier.height(22.dp))
         Text(book.title, style = MaterialTheme.typography.headlineSmall)
-        Text(book.author, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            book.author,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         Spacer(Modifier.height(12.dp))
-        Text(formatPrice(book.price), style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary)
+        Text(
+            formatPrice(book.price),
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
         Text(
             if (book.stock > 0) "Disponible · ${book.stock} en inventario" else "Agotado",
             color = if (book.stock > 0) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.error,
@@ -140,14 +152,21 @@ private fun BookDetailContent(
         Text("Género: ${book.genre}")
         Text("ISBN: ${book.isbn}")
         Spacer(Modifier.height(14.dp))
-        Text(book.description ?: "Sin descripción disponible.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            book.description ?: "Sin descripción disponible.",
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
 
         if (book.stock > 0) {
             Spacer(Modifier.height(24.dp))
             Text("Cantidad", style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(10.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                FilledTonalIconButton(onClick = onDecrement, enabled = quantity > 1, shape = CircleShape) {
+                FilledTonalIconButton(
+                    onClick = onDecrement,
+                    enabled = quantity > 1,
+                    shape = CircleShape
+                ) {
                     Icon(Icons.Default.Remove, contentDescription = "Disminuir cantidad")
                 }
                 Text(
@@ -155,7 +174,11 @@ private fun BookDetailContent(
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(horizontal = 24.dp)
                 )
-                FilledTonalIconButton(onClick = onIncrement, enabled = quantity < book.stock, shape = CircleShape) {
+                FilledTonalIconButton(
+                    onClick = onIncrement,
+                    enabled = quantity < book.stock,
+                    shape = CircleShape
+                ) {
                     Icon(Icons.Default.Add, contentDescription = "Aumentar cantidad")
                 }
             }

@@ -50,7 +50,10 @@ fun AppNavigation() {
     val session by sessionManager.session.collectAsState(initial = null)
 
     if (session == null) {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
+        Box(
+            Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) { CircularProgressIndicator() }
         return
     }
 
@@ -59,8 +62,10 @@ fun AppNavigation() {
     val adminViewModel: AdminViewModel = viewModel()
     val cartViewModel: CartViewModel = viewModel()
     val ordersViewModel: OrdersViewModel = viewModel()
-    val booksRepository = remember(context) { BooksRepository(RetrofitClient.getBooksApiService(context)) }
-    val booksViewModel: BooksViewModel = viewModel(factory = BooksViewModel.provideFactory(booksRepository))
+    val booksRepository =
+        remember(context) { BooksRepository(RetrofitClient.getBooksApiService(context)) }
+    val booksViewModel: BooksViewModel =
+        viewModel(factory = BooksViewModel.provideFactory(booksRepository))
 
     val loggedIn = !session?.token.isNullOrBlank()
     val isAdmin = session?.role == "admin"
@@ -70,11 +75,13 @@ fun AppNavigation() {
 
     NavHost(navController = navController, startDestination = startDestination) {
         composable(Routes.Login.route) {
-            LoginScreen(authViewModel, { navController.navigate(Routes.Home.route) { popUpTo(0) } },
+            LoginScreen(
+                authViewModel, { navController.navigate(Routes.Home.route) { popUpTo(0) } },
                 { navController.navigate(Routes.Register.route) })
         }
         composable(Routes.Register.route) {
-            RegisterScreen(authViewModel, { navController.navigate(Routes.Home.route) { popUpTo(0) } },
+            RegisterScreen(
+                authViewModel, { navController.navigate(Routes.Home.route) { popUpTo(0) } },
                 { navController.popBackStack() })
         }
         composable(Routes.Home.route) {
@@ -91,7 +98,8 @@ fun AppNavigation() {
         }
         composable(Routes.Profile.route) {
             if (loggedIn) {
-                ProfileScreen(profileViewModel, { navController.navigate(Routes.EditProfile.route) },
+                ProfileScreen(
+                    profileViewModel, { navController.navigate(Routes.EditProfile.route) },
                     { navController.navigate(Routes.ChangePassword.route) }, goToHome,
                     { navController.popBackStack() })
             } else {
@@ -136,19 +144,35 @@ fun AppNavigation() {
             )
         }
         composable(Routes.Cart.route) {
-            CartScreen({ navController.popBackStack() }, { navController.navigate(Routes.Checkout.route) }, goToLogin, cartViewModel)
+            CartScreen(
+                { navController.popBackStack() },
+                { navController.navigate(Routes.Checkout.route) },
+                goToLogin,
+                cartViewModel
+            )
         }
         composable(Routes.Checkout.route) {
             CheckoutScreen(
                 onBack = { navController.popBackStack() },
-                onOrderConfirmed = { navController.navigate(Routes.OrderDetail.create(it)) { popUpTo(Routes.Cart.route) { inclusive = true } } },
+                onOrderConfirmed = {
+                    navController.navigate(Routes.OrderDetail.create(it)) {
+                        popUpTo(
+                            Routes.Cart.route
+                        ) { inclusive = true }
+                    }
+                },
                 onUnauthorized = goToLogin,
                 cartViewModel = cartViewModel,
                 ordersViewModel = ordersViewModel
             )
         }
         composable(Routes.Orders.route) {
-            OrdersScreen({ navController.popBackStack() }, { navController.navigate(Routes.OrderDetail.create(it)) }, goToLogin, ordersViewModel)
+            OrdersScreen(
+                { navController.popBackStack() },
+                { navController.navigate(Routes.OrderDetail.create(it)) },
+                goToLogin,
+                ordersViewModel
+            )
         }
         composable(
             Routes.OrderDetail.route,

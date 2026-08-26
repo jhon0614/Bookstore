@@ -16,7 +16,9 @@ class CartViewModel(application: Application) : AndroidViewModel(application) {
     private val _uiState = MutableStateFlow(CartUiState())
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
 
-    init { loadCart() }
+    init {
+        loadCart()
+    }
 
     fun loadCart() = runRequest { repository.getCart() }
 
@@ -29,9 +31,11 @@ class CartViewModel(application: Application) : AndroidViewModel(application) {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null, message = null)
             when (val result = repository.addItem(bookId, quantity)) {
                 is DataResult.Success -> {
-                    _uiState.value = _uiState.value.copy(message = result.data.message ?: "Libro agregado")
+                    _uiState.value =
+                        _uiState.value.copy(message = result.data.message ?: "Libro agregado")
                     loadCart()
                 }
+
                 is DataResult.Error -> showError(result)
             }
         }
@@ -67,6 +71,7 @@ class CartViewModel(application: Application) : AndroidViewModel(application) {
                 is DataResult.Success -> _uiState.value = _uiState.value.copy(
                     isLoading = false, cart = result.data, unauthorized = false
                 )
+
                 is DataResult.Error -> showError(result)
             }
         }

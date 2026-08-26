@@ -7,17 +7,10 @@ import retrofit2.http.Query
 /**
  * Servicio Retrofit para el módulo de libros.
  *
- * Endpoints usados (los únicos disponibles según el backend):
+ * Endpoints usados:
  *  - GET /api/books/
  *  - GET /api/books/{id}
  *  - GET /api/categories/
- *
- * NOTA sobre GET /api/categories/:
- * El enunciado no especifica la forma exacta de la respuesta de este endpoint.
- * Aquí se asume que devuelve un arreglo JSON plano de objetos Category, ej:
- * [ { "id": 1, "name": "Ficción" }, { "id": 2, "name": "Ciencia" } ]
- * Si en tu backend viene envuelto (ej: { "categories": [...] }), avísame y
- * ajusto solo este método (una línea) sin tocar el resto del código.
  */
 interface BooksApiService {
 
