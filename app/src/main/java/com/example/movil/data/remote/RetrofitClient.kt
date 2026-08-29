@@ -13,7 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
     // Emulador Android. Para celular físico, usar aquí la IP local del computador.
-    private const val BASE_URL = "http://10.127.120.229:5050"
+    private const val BASE_URL = "https://bookstore-api-fyh9.onrender.com"
 
     @Volatile private var retrofitInstance: Retrofit? = null
 
